@@ -1,6 +1,161 @@
 {
   "store_url": "https://basalam.com/nana-accessory",
-  "updated_at": null,
-  "source": "basalam",
-  "products": []
+  "updated_at": "2026-10-30T22:23:17+00:00",
+  "source": "basalam-public-storefront",
+  "products": [
+    {
+      "id": "4",
+      "name": "آرایشی و بهداشتی",
+      "url": "https://basalam.com/nana-accessory/product/beauty",
+      "image": "",
+      "price": null
+    },
+    {
+      "id": "14",
+      "name": "ابزارآلات و تجهیزات",
+      "url": "https://basalam.com/nana-accessory/product/tools",
+      "image": "",
+      "price": null
+    },
+    {
+      "id": "notice",
+      "name": "اطلاعیه‌ها",
+      "url": "https://basalam.com/nana-accessory/product/notice",
+      "image": "",
+      "price": null
+    },
+    {
+      "id": "https://basalam.com/ticket",
+      "name": "تیکت",
+      "url": "https://basalam.com/ticket",
+      "image": "",
+      "price": null
+    },
+    {
+      "id": "11",
+      "name": "خانه و آشپزخانه",
+      "url": "https://basalam.com/nana-accessory/product/home",
+      "image": "",
+      "price": null
+    },
+    {
+      "id": "purchase",
+      "name": "خرید‌ها",
+      "url": "https://basalam.com/nana-accessory/product/purchase",
+      "image": "",
+      "price": null
+    },
+    {
+      "id": "3",
+      "name": "خودرو و موتورسیکلت",
+      "url": "https://basalam.com/nana-accessory/product/auto",
+      "image": "",
+      "price": null
+    },
+    {
+      "id": "10",
+      "name": "سلامت و پزشکی",
+      "url": "https://basalam.com/nana-accessory/product/health",
+      "image": "",
+      "price": null
+    },
+    {
+      "id": "social",
+      "name": "شبکه اجتماعی",
+      "url": "https://basalam.com/nana-accessory/product/social",
+      "image": "",
+      "price": null
+    },
+    {
+      "id": "8",
+      "name": "طلا و جواهرات",
+      "url": "https://basalam.com/nana-accessory/product/gold",
+      "image": "",
+      "price": null
+    },
+    {
+      "id": "6",
+      "name": "فرهنگی هنری",
+      "url": "https://basalam.com/nana-accessory/product/cultural",
+      "image": "",
+      "price": null
+    },
+    {
+      "id": "2",
+      "name": "لوازم خانگی برقی",
+      "url": "https://basalam.com/nana-accessory/product/appliances",
+      "image": "",
+      "price": null
+    },
+    {
+      "id": "1",
+      "name": "مد و پوشاک",
+      "url": "https://basalam.com/nana-accessory/product/apparel",
+      "image": "",
+      "price": null
+    },
+    {
+      "id": "vendor_management",
+      "name": "مدیریت غرفه",
+      "url": "https://basalam.com/nana-accessory/product/vendor_management",
+      "image": "",
+      "price": null
+    },
+    {
+      "id": "9",
+      "name": "مواد غذایی و سوپر مارکت",
+      "url": "https://basalam.com/nana-accessory/product/grocery",
+      "image": "",
+      "price": null
+    },
+    {
+      "id": "1161426",
+      "name": "نانا اکسسوری شاپ",
+      "url": "https://basalam.com/nana-accessory/product/nana-accessory",
+      "image": "",
+      "price": null
+    },
+    {
+      "id": "all",
+      "name": "همه",
+      "url": "https://basalam.com/nana-accessory/product/all",
+      "image": "",
+      "price": null
+    },
+    {
+      "id": "13",
+      "name": "ورزش و سفر",
+      "url": "https://basalam.com/nana-accessory/product/sport",
+      "image": "",
+      "price": null
+    },
+    {
+      "id": "https://basalam.com/help",
+      "name": "پرسش های متداول",
+      "url": "https://basalam.com/help",
+      "image": "",
+      "price": null
+    },
+    {
+      "id": "7",
+      "name": "کالای دیجیتال",
+      "url": "https://basalam.com/nana-accessory/product/digital",
+      "image": "",
+      "price": null
+    },
+    {
+      "id": "5",
+      "name": "کتاب",
+      "url": "https://basalam.com/nana-accessory/product/book",
+      "image": "",
+      "price": null
+    },
+    {
+      "id": "12",
+      "name": "کودک و نوزاد و اسباب بازی",
+      "url": "https://basalam.com/nana-accessory/product/kids",
+      "image": "",
+      "price": null
+    }
+  ]
 }
