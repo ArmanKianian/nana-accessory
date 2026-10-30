@@ -1,4 +1,5 @@
 node_modules/
 dist/
 .astro/
-.DS_Store
+__pycache__/
+*.pyc

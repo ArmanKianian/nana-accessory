@@ -1,11 +1,9 @@
-import { defineConfig } from "astro/config";
-import sitemap from "@astrojs/sitemap";
-import tailwind from "@tailwindcss/vite";
-
-const site = "https://nana-accessory.ir";
+import { defineConfig } from 'astro/config';
+import sitemap from '@astrojs/sitemap';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  site,
+  site: 'https://nana-accessory.ir',
   integrations: [sitemap()],
-  vite: { plugins: [tailwind()] }
+  vite: { plugins: [tailwindcss()] }
 });

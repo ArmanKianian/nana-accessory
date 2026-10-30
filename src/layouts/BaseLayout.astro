@@ -1,43 +1,25 @@
 ---
-import "../styles/global.css";
-const {
-  title = "نانا اکسسوری شاپ | اکسسوری دخترانه و فانتزی",
-  description = "نانا اکسسوری شاپ؛ دنیایی از اکسسوری‌های دخترانه، فانتزی و اکسسوری مو. مدل‌های جدید را ببین و برای اطلاع از قیمت، موجودی و سفارش به اینستاگرام نانا پیام بده.",
-  canonical = "https://armankianian.github.io/nana-accessoryy-fa/",
-  image = "https://armankianian.github.io/nana-accessoryy-fa/og-cover.svg",
-  noindex = false
-} = Astro.props;
-const base = import.meta.env.BASE_URL;
+import '../styles/global.css';
+const { title = 'نانا اکسسوری شاپ | خرید اکسسوری دخترانه و فانتزی', description = 'خرید اکسسوری دخترانه، اکسسوری مو، گیره و کلیپس، اکسسوری فانتزی و هدیه‌های بامزه از نانا اکسسوری شاپ.', image = 'https://nana-accessory.ir/og-cover.svg', canonical = 'https://nana-accessory.ir/' } = Astro.props;
 ---
 <!doctype html>
 <html lang="fa" dir="rtl">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#fffaf7" />
-    <meta name="format-detection" content="telephone=no" />
+    <meta name="theme-color" content="#fff7f7" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <meta name="author" content="نانا اکسسوری شاپ" />
-    <meta name="robots" content={noindex ? "noindex,nofollow" : "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"} />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
     <link rel="canonical" href={canonical} />
-    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
-    <link rel="sitemap" href="https://armankianian.github.io/nana-accessoryy-fa/sitemap-index.xml" />
-    <meta property="og:locale" content="fa_IR" />
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="نانا اکسسوری شاپ" />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={image} />
-    <meta property="og:image:alt" content="نانا اکسسوری شاپ؛ دنیایی از اکسسوری‌های دوست‌داشتنی" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={image} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://statics.basalam.com" crossorigin />
+    <link rel="preconnect" href="https://basalam.com" />
+    <meta property="og:type" content="website" /><meta property="og:locale" content="fa_IR" />
+    <meta property="og:site_name" content="نانا اکسسوری شاپ" /><meta property="og:title" content={title} />
+    <meta property="og:description" content={description} /><meta property="og:url" content={canonical} /><meta property="og:image" content={image} />
+    <meta name="twitter:card" content="summary_large_image" /><meta name="twitter:title" content={title} /><meta name="twitter:description" content={description} /><meta name="twitter:image" content={image} />
     <slot name="head" />
   </head>
-  <body>
-    <slot />
-  </body>
+  <body><slot /></body>
 </html>

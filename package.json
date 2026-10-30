@@ -1,17 +1,8 @@
 {
-  "name": "nana-accessoryy-fa",
+  "name": "nana-accessory-shop",
   "type": "module",
   "version": "1.0.0",
   "private": true,
-  "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview"
-  },
-  "dependencies": {
-    "@astrojs/sitemap": "^3.6.0",
-    "@tailwindcss/vite": "^4.1.14",
-    "astro": "^5.18.2",
-    "tailwindcss": "^4.1.14"
-  }
+  "scripts": {"dev": "astro dev", "build": "astro build", "preview": "astro preview", "sync:products": "python3 scripts/sync_basalam.py"},
+  "dependencies": {"@astrojs/sitemap": "^3.6.0", "astro": "^5.18.2", "@tailwindcss/vite": "^4.1.17", "tailwindcss": "^4.1.17"}
 }
