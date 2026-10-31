@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 300" fill="none">
+  <defs>
+    <linearGradient id="pink" x1="45" y1="45" x2="370" y2="270" gradientUnits="userSpaceOnUse"><stop stop-color="#FFDDE8"/><stop offset=".52" stop-color="#F5AFC5"/><stop offset="1" stop-color="#E77FA3"/></linearGradient>
+    <linearGradient id="edge" x1="100" y1="60" x2="320" y2="245" gradientUnits="userSpaceOnUse"><stop stop-color="#FFF9F7"/><stop offset="1" stop-color="#E9A1B8"/></linearGradient>
+    <linearGradient id="berry" x1="180" y1="10" x2="245" y2="100" gradientUnits="userSpaceOnUse"><stop stop-color="#FF8099"/><stop offset="1" stop-color="#D92E55"/></linearGradient>
+    <filter id="shadow" x="8" y="4" width="404" height="292" filterUnits="userSpaceOnUse"><feGaussianBlur stdDeviation="7"/></filter>
+  </defs>
+  <ellipse cx="210" cy="254" rx="145" ry="20" fill="#A84D70" opacity=".13" filter="url(#shadow)"/>
+  <!-- ribbon tails -->
+  <path d="M190 164 116 267l-12-65-65-26 126-49 45 37ZM230 164l74 103 12-65 65-26-126-49-45 37Z" fill="url(#pink)" stroke="#D8799B" stroke-width="7" stroke-linejoin="round"/>
+  <path d="m116 267 38-17-50-48M304 267l-38-17 50-48" stroke="#FFF4F5" stroke-width="7" stroke-linecap="round" opacity=".9"/>
+  <!-- bow loops -->
+  <path d="M203 139C155 88 86 34 48 66 8 100 67 174 176 187c19 2 32-14 27-48Z" fill="url(#pink)" stroke="#D8799B" stroke-width="8"/>
+  <path d="M217 139c48-51 117-105 155-73 40 34-19 108-128 121-19 2-32-14-27-48Z" fill="url(#pink)" stroke="#D8799B" stroke-width="8"/>
+  <!-- lace-like dotted edges -->
+  <path d="M43 77c28-17 91 23 139 71M377 77c-28-17-91 23-139 71" stroke="url(#edge)" stroke-width="7" stroke-linecap="round" stroke-dasharray="2 11"/>
+  <path d="M83 91c25 18 48 39 67 61M337 91c-25 18-48 39-67 61" stroke="#FFF8F7" stroke-width="4" stroke-linecap="round" opacity=".9"/>
+  <!-- strawberry print -->
+  <g fill="#D92E55"><path d="M91 101c-11-4-18 3-17 13 1 9 12 18 20 23 8-7 17-18 15-27-2-9-11-13-18-9Z"/><path d="M145 147c-9-4-16 2-15 10 1 8 10 15 17 19 7-6 14-15 13-22-2-8-9-11-15-7Z"/><path d="M290 145c-9-4-16 2-15 10 1 8 10 15 17 19 7-6 14-15 13-22-2-8-9-11-15-7Z"/><path d="M337 101c-11-4-18 3-17 13 1 9 12 18 20 23 8-7 17-18 15-27-2-9-11-13-18-9Z"/></g>
+  <g fill="#579B61"><path d="m84 99 7-12 5 12 10-6-5 13-13 1Z"/><path d="m138 145 7-10 5 10 9-5-4 12-12 1Z"/><path d="m283 143 7-10 5 10 9-5-4 12-12 1Z"/><path d="m330 99 7-12 5 12 10-6-5 13-13 1Z"/></g>
+  <g fill="#FFE6A7"><ellipse cx="88" cy="113" rx="2.2" ry="3.5"/><ellipse cx="99" cy="120" rx="2.2" ry="3.5"/><ellipse cx="143" cy="156" rx="2" ry="3"/><ellipse cx="152" cy="164" rx="2" ry="3"/><ellipse cx="288" cy="154" rx="2" ry="3"/><ellipse cx="298" cy="162" rx="2" ry="3"/><ellipse cx="334" cy="113" rx="2.2" ry="3.5"/><ellipse cx="345" cy="120" rx="2.2" ry="3.5"/></g>
+  <!-- center knot -->
+  <path d="M176 128c-9-24-2-42 34-45 36 3 43 21 34 45l-13 36c-5 13-37 13-42 0l-13-36Z" fill="#E98BAA" stroke="#D8799B" stroke-width="7"/>
+  <path d="M194 100c9-7 23-7 32 0" stroke="#FFDCE7" stroke-width="5" stroke-linecap="round"/>
+  <!-- berry charm -->
+  <path d="M210 12c-12-8-28-2-32 13-6 23 12 52 32 67 20-15 38-44 32-67-4-15-20-21-32-13Z" fill="url(#berry)" stroke="#C92B50" stroke-width="5"/>
+  <path d="M210 17c-4-13 4-18 12-14-1 8-5 13-12 14ZM208 18c-9-12-19-9-20-1 8 5 14 5 20 1ZM214 18c8-12 19-9 20-1-8 5-14 5-20 1Z" fill="#62A66B" stroke="#478C58" stroke-width="3" stroke-linejoin="round"/>
+  <g fill="#FFF0C7"><ellipse cx="195" cy="38" rx="3" ry="5" transform="rotate(-20 195 38)"/><ellipse cx="224" cy="37" rx="3" ry="5" transform="rotate(20 224 37)"/><ellipse cx="187" cy="55" rx="3" ry="5" transform="rotate(-20 187 55)"/><ellipse cx="210" cy="60" rx="3" ry="5"/><ellipse cx="233" cy="55" rx="3" ry="5" transform="rotate(20 233 55)"/><ellipse cx="199" cy="75" rx="2.7" ry="4"/><ellipse cx="221" cy="75" rx="2.7" ry="4"/></g>
+  <path d="M179 25c4-8 11-10 17-8" stroke="#FFB7C7" stroke-width="5" stroke-linecap="round"/>
+  <path d="M25 34c5-8 17-8 22 0M385 218c5-8 17-8 22 0" stroke="#E88BA8" stroke-width="5" stroke-linecap="round"/>
+</svg>
