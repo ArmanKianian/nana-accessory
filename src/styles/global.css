@@ -4,3 +4,16 @@
 .container{width:min(1160px,calc(100% - 40px));margin-inline:auto}.soft-shadow{box-shadow:0 18px 55px rgba(112,59,79,.09)}.pink-gradient{background:linear-gradient(135deg,#fff0f4 0%,#fff8ee 52%,#f7efff 100%)}.product-card{transition:transform .22s ease,box-shadow .22s ease}.product-card:hover{transform:translateY(-5px);box-shadow:0 18px 40px rgba(112,59,79,.13)}.product-image{aspect-ratio:1/1;object-fit:cover;background:#f8edf0}.ornament{color:#dc8ba7}
 
 .button-primary{background:#60394b!important;color:#fff!important;-webkit-text-fill-color:#fff!important}.button-primary:hover{background:#8c4d68!important;color:#fff!important;-webkit-text-fill-color:#fff!important}.cute-dots{background-image:radial-gradient(#e9b8c8 1px,transparent 1px);background-size:18px 18px}.product-detail-image{aspect-ratio:1/1;object-fit:cover;background:#f8edf0}.soft-card{box-shadow:0 16px 45px rgba(112,59,79,.09)}
+
+
+/* Accessible, consistent CTA colours (avoid utility-class conflicts). */
+.button-primary,.button-primary:visited{background:#60394b!important;color:#fff!important;-webkit-text-fill-color:#fff!important}
+.button-primary:hover,.button-primary:focus-visible{background:#8c4d68!important;color:#fff!important;-webkit-text-fill-color:#fff!important}
+.button-light,.button-light:visited{background:#fff!important;color:#71465a!important;-webkit-text-fill-color:#71465a!important;border:1px solid #f0d5df}
+.button-light:hover,.button-light:focus-visible{background:#fff0f5!important;color:#60394b!important;-webkit-text-fill-color:#60394b!important}
+.button-outline-light,.button-outline-light:visited{color:#fff!important;-webkit-text-fill-color:#fff!important;border:1px solid rgba(255,255,255,.65)}
+.button-outline-light:hover,.button-outline-light:focus-visible{background:rgba(255,255,255,.14)!important;color:#fff!important;-webkit-text-fill-color:#fff!important}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid #d96f91;outline-offset:4px}
+img{max-width:100%}
+@media(max-width:639px){.container{width:min(100% - 28px,1160px)}body{padding-bottom:76px}.product-card{border-radius:1.2rem}.product-card:hover{transform:none}.mobile-action-bar{padding-bottom:max(10px,env(safe-area-inset-bottom))}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}

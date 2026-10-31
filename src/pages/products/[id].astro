@@ -69,16 +69,17 @@ const breadcrumbSchema = {
           <p class="mt-2 text-2xl font-black text-[#a64f72]">{product.price ? `${Number(product.price).toLocaleString('fa-IR')} تومان` : 'استعلام قیمت در باسلام'}</p>
           <p class="mt-2 text-[11px] leading-6 text-[#ad929d]">قیمت و موجودی نهایی ممکنه تغییر کنه؛ قبل از سفارش در باسلام بررسی کن.</p>
         </div>
-        <div class="mt-7 flex flex-wrap gap-3">
-          <a class="button-primary inline-flex items-center justify-center rounded-full px-7 py-4 text-sm font-black shadow-lg transition hover:-translate-y-1" href={product.url} target="_blank" rel="noopener noreferrer">خرید و بررسی موجودی در باسلام ↗</a>
-          <a class="inline-flex items-center justify-center rounded-full border border-[#e7bdcb] bg-white px-6 py-4 text-sm font-bold text-[#805466] transition hover:bg-[#fff1f5]" href="/#products">بازگشت به محصولات</a>
+        <div class="mt-7 flex flex-col gap-3 min-[430px]:flex-row">
+          <a class="button-primary inline-flex min-h-12 items-center justify-center rounded-full px-6 py-4 text-sm font-black shadow-lg transition hover:-translate-y-1" href="https://www.instagram.com/nana.accessoryy/" target="_blank" rel="noopener noreferrer">سفارش و سوال در دایرکت اینستاگرام ↗</a>
+          <a class="button-light inline-flex min-h-12 items-center justify-center rounded-full px-6 py-4 text-sm font-bold transition" href={product.url} target="_blank" rel="noopener noreferrer">بررسی و خرید در باسلام ↗</a>
         </div>
+        <a class="mt-4 inline-flex text-xs font-bold text-[#a65d79] hover:text-[#71465a]" href="/#products">← بازگشت به همه محصولات</a>
         <p class="mt-7 text-xs leading-7 text-[#ad929d]">♡ نانا اکسسوری شاپ | انتخاب‌های فانتزی و دوست‌داشتنی</p>
       </div>
     </section>
     {related.length > 0 && <section class="mt-24 border-t border-rose-100 pt-12">
       <div class="mb-7 flex items-end justify-between gap-4"><div><p class="text-sm font-black text-[#c16c8d]">شاید اینا رو هم دوست داشته باشی ✿</p><h2 class="mt-2 text-2xl font-black text-[#593544]">چندتا خوشگل دیگه</h2></div><a href="/#products" class="text-xs font-bold text-[#a65d79]">همه محصولات ←</a></div>
-      <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
         {related.map((item) => <a href={`/products/${item.id}/`} class="product-card rounded-[1.5rem] border border-rose-100 bg-white p-2.5">
           <img src={item.image || '/product-placeholder.svg'} alt={item.name} loading="lazy" decoding="async" class="product-image w-full rounded-[1.1rem]" />
           <h3 class="px-2 pt-3 text-sm leading-6 font-extrabold text-[#62414f]">{item.name}</h3>
@@ -88,4 +89,7 @@ const breadcrumbSchema = {
     </section>}
   </main>
   <footer class="mt-12 border-t border-rose-100 bg-white py-8"><div class="container flex flex-col items-center justify-between gap-3 text-center text-xs text-[#a27b89] sm:flex-row"><a href="/" class="font-black text-[#70495a]">♡ نانا اکسسوری شاپ</a><a href="https://basalam.com/nana-accessory" target="_blank" rel="noopener noreferrer">غرفه نانا در باسلام ↗</a><a href="https://www.instagram.com/nana.accessoryy/" target="_blank" rel="noopener noreferrer">اینستاگرام ↗</a></div></footer>
+  <div class="mobile-action-bar fixed inset-x-0 bottom-0 z-[60] border-t border-rose-200/80 bg-[#fffaf8]/95 px-3 pt-2 shadow-[0_-8px_30px_rgba(112,59,79,.12)] backdrop-blur-xl sm:hidden">
+    <a href="https://www.instagram.com/nana.accessoryy/" target="_blank" rel="noopener noreferrer" class="button-primary flex min-h-12 w-full items-center justify-center rounded-full text-sm font-black">سفارش و مشاوره در دایرکت اینستاگرام ↗</a>
+  </div>
 </BaseLayout>
