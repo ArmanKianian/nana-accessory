@@ -1,56 +1,83 @@
 #!/usr/bin/env python3
-"""Sync ONLY Nana Accessory's catalogue from Basalam's vendor-products API.
+"""Scrape Nana Accessory's public Basalam storefront and its product pages.
 
-The storefront HTML is used solely to verify the canonical vendor identity.
-Product discovery never scans arbitrary links or unrelated product pages.
+No guessed API endpoints and no site-wide link crawling: product URLs must be
+under /nana-accessory/product/<numeric-id> on basalam.com. Each product page is
+opened and its visible title, price and image are extracted from rendered HTML.
 """
 from __future__ import annotations
 
 import json
-import os
 import re
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
-from urllib.parse import quote
+from urllib.parse import urlparse
 
-import requests
+from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
+from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "src" / "data" / "products.json"
 STORE_URL = "https://basalam.com/nana-accessory"
-EXPECTED_IDENTIFIER = "nana-accessory"
-EXPECTED_VENDOR_ID = 1_161_426
-# Public vendor catalogue endpoint used by Basalam's vendor-products service.
-API_URL = "https://services.basalam.com/v1/vendors/{vendor_id}/products"
-PER_PAGE = 100
-MAX_PAGES = 20
+STORE_PATH = "/nana-accessory"
+STORE_NAME = "نانا اکسسوری شاپ"
+EXPECTED_VENDOR_ID = 1_161_426  # Read from the store page's embedded vendor data.
+MAX_SCROLLS = 12
+PAGE_TIMEOUT_MS = 45_000
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/128.0.0.0 Safari/537.36",
-    "Accept": "application/json, text/plain, */*",
     "Accept-Language": "fa-IR,fa;q=0.9,en;q=0.7",
-    "Origin": "https://basalam.com",
-    "Referer": STORE_URL,
 }
 
+_DIGIT_MAP = str.maketrans("۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩", "01234567890123456789")
 
-def read_store_identity(session: requests.Session) -> tuple[int, int | None]:
-    response = session.get(STORE_URL, timeout=35)
-    response.raise_for_status()
-    html = response.text
-    match = re.search(
-        r'<script[^>]+id=["\']__NEXT_DATA__["\'][^>]*>(.*?)</script>',
-        html,
-        re.I | re.S,
-    )
+
+def ascii_digits(value: str) -> str:
+    return value.translate(_DIGIT_MAP)
+
+
+def product_id_from_href(href: str) -> str | None:
+    """Accept only product links belonging to Nana's exact storefront path."""
+    if not href:
+        return None
+    parsed = urlparse(href)
+    if parsed.netloc and parsed.netloc.lower() not in {"basalam.com", "www.basalam.com"}:
+        return None
+    match = re.fullmatch(r"/nana-accessory/product/(\d+)/?", parsed.path)
+    return match.group(1) if match else None
+
+
+def parse_count(text: str) -> int | None:
+    normalized = ascii_digits(text)
+    match = re.search(r"([0-9][0-9,٬،]*)\s*محصول\s*موجود", normalized)
     if not match:
-        raise RuntimeError("Basalam storefront did not include its Next.js store data.")
+        return None
+    return int(re.sub(r"\D", "", match.group(1)))
+
+
+def parse_visible_price(lines: list[str]) -> int | None:
+    """Read a standalone price line, not stock counts or unrelated page numbers."""
+    for line in lines:
+        value = ascii_digits(line).strip().replace("٬", "").replace("،", "").replace(",", "").replace(" ", "")
+        if re.fullmatch(r"[0-9]{4,}", value):
+            amount = int(value)
+            # Basalam accessory prices are shown in Toman; reject implausible noise.
+            if 1_000 <= amount <= 10_000_000_000:
+                return amount
+    return None
+
+
+def extract_store_identity(page) -> tuple[int, int | None]:
+    """Verify the rendered store is Nana, using its embedded Next.js state."""
+    data = page.locator("script#__NEXT_DATA__").text_content(timeout=10_000)
+    if not data:
+        raise RuntimeError("Nana storefront did not expose its embedded store data.")
     try:
-        next_data = json.loads(match.group(1))
-        queries = next_data["props"]["pageProps"]["dehydratedState"]["queries"]
-    except (ValueError, KeyError, TypeError) as exc:
-        raise RuntimeError("Could not read the storefront's vendor identity.") from exc
+        next_data = json.loads(data)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError("Could not parse Basalam storefront data.") from exc
 
     def walk(value: Any):
         if isinstance(value, dict):
@@ -61,177 +88,152 @@ def read_store_identity(session: requests.Session) -> tuple[int, int | None]:
             for child in value:
                 yield from walk(child)
 
-    vendor = None
-    for query in queries:
-        state_data = query.get("state", {}).get("data")
-        vendor = next(
-            (candidate for candidate in walk(state_data)
-             if candidate.get("identifier") == EXPECTED_IDENTIFIER),
-            None,
-        )
-        if vendor:
-            break
-
+    vendor = next((item for item in walk(next_data)
+                   if item.get("identifier") == "nana-accessory" and item.get("title") == STORE_NAME), None)
     if not vendor:
-        raise RuntimeError(f"Store page did not identify vendor '{EXPECTED_IDENTIFIER}'.")
+        raise RuntimeError("The page did not identify the expected Nana Accessory storefront.")
     vendor_id = int(vendor.get("id", 0))
     if vendor_id != EXPECTED_VENDOR_ID:
-        raise RuntimeError(
-            f"Vendor identity mismatch: expected {EXPECTED_VENDOR_ID}, got {vendor_id}."
+        raise RuntimeError(f"Store identity mismatch: expected {EXPECTED_VENDOR_ID}, got {vendor_id}.")
+    count = vendor.get("productCount")
+    return vendor_id, int(count) if count is not None else None
+
+
+def collect_product_urls(page) -> list[str]:
+    """Collect only exact Nana product-card URLs after triggering lazy loading."""
+    found: set[str] = set()
+    for _ in range(MAX_SCROLLS):
+        hrefs = page.locator('a[href*="/nana-accessory/product/"]').evaluate_all(
+            "els => els.map(el => el.getAttribute('href')).filter(Boolean)"
         )
-    advertised_count = vendor.get("productCount")
-    return vendor_id, int(advertised_count) if advertised_count is not None else None
-
-
-def unwrap_products(payload: Any) -> tuple[list[dict], dict]:
-    """Accept the API's common envelope shapes, but never guess from HTML links."""
-    if isinstance(payload, list):
-        return [x for x in payload if isinstance(x, dict)], {}
-    if not isinstance(payload, dict):
-        raise RuntimeError("Vendor products API returned an unexpected response type.")
-    for key in ("data", "products", "items", "result"):
-        value = payload.get(key)
-        if isinstance(value, list):
-            return [x for x in value if isinstance(x, dict)], payload
-        if isinstance(value, dict):
-            for nested_key in ("data", "products", "items"):
-                nested = value.get(nested_key)
-                if isinstance(nested, list):
-                    return [x for x in nested if isinstance(x, dict)], value
-    raise RuntimeError("Could not find the product list in the vendor API response.")
-
-
-def first_image(product: dict) -> str:
-    for key in ("photo", "photos", "images", "image", "gallery", "cover"):
-        value = product.get(key)
-        values = value if isinstance(value, list) else [value]
-        for entry in values:
-            if isinstance(entry, str) and entry.startswith("https://"):
-                return entry
-            if isinstance(entry, dict):
-                for image_key in ("original", "lg", "md", "url", "src"):
-                    candidate = entry.get(image_key)
-                    if isinstance(candidate, str) and candidate.startswith("https://"):
-                        return candidate
-    return ""
-
-
-def to_int(value: Any) -> int | None:
-    if isinstance(value, dict):
-        for key in ("amount", "value", "price"):
-            parsed = to_int(value.get(key))
-            if parsed is not None:
-                return parsed
-        return None
-    if isinstance(value, (int, float)) and value > 0:
-        return int(value)
-    if isinstance(value, str):
-        digits = re.sub(r"[^0-9]", "", value)
-        return int(digits) if digits else None
-    return None
-
-
-def normalize_product(raw: dict) -> dict | None:
-    # Vendor API product records should carry vendor_id. If present, enforce it.
-    owner = raw.get("vendor_id")
-    if owner is None and isinstance(raw.get("vendor"), dict):
-        owner = raw["vendor"].get("id")
-    if owner is not None and int(owner) != EXPECTED_VENDOR_ID:
-        return None
-
-    product_id = raw.get("id") or raw.get("product_id")
-    title = raw.get("name") or raw.get("title")
-    if not product_id or not isinstance(title, str) or len(title.strip()) < 2:
-        return None
-
-    price_raw = None
-    for key in ("primary_price", "price", "final_price", "selling_price"):
-        if raw.get(key) is not None:
-            price_raw = to_int(raw[key])
-            if price_raw:
-                break
-    # Basalam's API price values are in rials; the storefront displays tomans.
-    price_toman = round(price_raw / 10) if price_raw else None
-
-    slug = raw.get("slug") or raw.get("identifier")
-    product_url = f"https://basalam.com/p/{quote(str(product_id))}"
-    if slug:
-        product_url += f"/{quote(str(slug))}"
-
-    return {
-        "id": str(product_id),
-        "name": title.strip(),
-        "url": product_url,
-        "image": first_image(raw),
-        "price": price_toman,
-    }
-
-
-def fetch_all_products(session: requests.Session, vendor_id: int) -> list[dict]:
-    all_products: dict[str, dict] = {}
-    for page in range(1, MAX_PAGES + 1):
-        response = session.get(
-            API_URL.format(vendor_id=vendor_id),
-            params={"page": page, "per_page": PER_PAGE, "sort": "id:asc", "variants_flatting": "false"},
-            timeout=35,
-        )
-        response.raise_for_status()
-        try:
-            payload = response.json()
-        except ValueError as exc:
-            raise RuntimeError("Vendor products endpoint did not return JSON.") from exc
-        records, metadata = unwrap_products(payload)
-        for raw in records:
-            product = normalize_product(raw)
-            if product:
-                all_products[product["id"]] = product
-
-        total_pages = metadata.get("total_page") or metadata.get("total_pages")
-        if total_pages is not None and page >= int(total_pages):
+        for href in hrefs:
+            product_id = product_id_from_href(href)
+            if product_id:
+                found.add(product_id)
+        if len(found) >= 18:
             break
-        if len(records) < PER_PAGE:
-            break
-    else:
-        raise RuntimeError(f"Reached the {MAX_PAGES}-page safety limit; refusing partial sync.")
+        page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+        page.wait_for_timeout(900)
 
-    return list(all_products.values())
+    return [f"https://basalam.com{STORE_PATH}/product/{pid}" for pid in sorted(found)]
+
+
+def scrape_product(page, url: str) -> dict:
+    page.goto(url, wait_until="domcontentloaded", timeout=PAGE_TIMEOUT_MS)
+    try:
+        page.locator("h1").first.wait_for(state="visible", timeout=15_000)
+    except PlaywrightTimeoutError as exc:
+        raise RuntimeError(f"Product page did not render an H1: {url}") from exc
+    page.wait_for_timeout(500)
+
+    data = page.evaluate("""() => {
+      const text = document.body?.innerText || '';
+      const h1 = document.querySelector('h1')?.innerText?.trim() || '';
+      const meta = (key) => document.querySelector(`meta[property='${key}'],meta[name='${key}']`)?.content || '';
+      const image = meta('og:image') || meta('twitter:image') || '';
+      const canonical = document.querySelector('link[rel=canonical]')?.href || location.href;
+      const images = [...document.images].map(i => ({src: i.currentSrc || i.src, alt: i.alt || ''}));
+      return {text, h1, image, canonical, images,
+        vendorLink: [...document.querySelectorAll('a[href]')].some(a => {
+          try { const u = new URL(a.href); return u.hostname.endsWith('basalam.com') && u.pathname.replace(/\\/$/, '') === '/nana-accessory'; }
+          catch { return false; }
+        })};
+    }""")
+
+    if STORE_NAME not in data["text"] and not data["vendorLink"]:
+        raise RuntimeError(f"Product does not appear to belong to Nana's shop: {url}")
+    title = data["h1"]
+    if not title or title == STORE_NAME:
+        raise RuntimeError(f"Could not extract a product title from {url}")
+
+    lines = [line.strip() for line in data["text"].splitlines() if line.strip()]
+    try:
+        title_index = next(i for i, line in enumerate(lines) if line == title)
+    except StopIteration:
+        title_index = 0
+    price = parse_visible_price(lines[title_index + 1:title_index + 12])
+    if price is None:
+        # Fallback to machine-readable product metadata if Basalam adds it.
+        price = page.evaluate("""() => {
+          const raw = document.querySelector('meta[property="product:price:amount"]')?.content;
+          if (!raw) return null;
+          const n = Number(raw.replace(/[^0-9.]/g, ''));
+          return Number.isFinite(n) && n > 0 ? Math.round(n) : null;
+        }""")
+    if not price:
+        raise RuntimeError(f"Could not find the visible product price on {url}")
+
+    image = data["image"]
+    if not image:
+        matching = next((item["src"] for item in data["images"]
+                         if item["src"] and (title in item["alt"] or item["alt"] in title)), "")
+        image = matching or next((item["src"] for item in data["images"]
+                                  if item["src"] and "statics.basalam.com" in item["src"]), "")
+    if not image.startswith("https://"):
+        raise RuntimeError(f"Could not find a valid product image on {url}")
+
+    product_id = product_id_from_href(url)
+    if not product_id:
+        raise RuntimeError(f"Unexpected product URL: {url}")
+    return {"id": product_id, "name": title, "url": url, "image": image, "price": price}
 
 
 def main() -> None:
-    session = requests.Session()
-    session.headers.update(HEADERS)
-    vendor_id, advertised_count = read_store_identity(session)
-    products = fetch_all_products(session, vendor_id)
-
-    if not products:
-        raise RuntimeError("Nana's vendor API returned zero valid products; old catalogue preserved.")
-    if advertised_count is not None and len(products) != advertised_count:
-        raise RuntimeError(
-            f"Catalogue count mismatch: storefront says {advertised_count}, API returned {len(products)}. "
-            "Old catalogue preserved to avoid publishing an incomplete list."
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch(headless=True)
+        context = browser.new_context(
+            user_agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+            locale="fa-IR",
+            extra_http_headers=HEADERS,
+            viewport={"width": 1440, "height": 1000},
         )
+        page = context.new_page()
+        page.goto(STORE_URL, wait_until="domcontentloaded", timeout=PAGE_TIMEOUT_MS)
+        page.locator("script#__NEXT_DATA__").wait_for(state="attached", timeout=15_000)
+        vendor_id, advertised_count = extract_store_identity(page)
+        product_urls = collect_product_urls(page)
 
-    old = {}
+        if not product_urls:
+            raise RuntimeError("No Nana product-card links were found in the rendered storefront.")
+        if advertised_count is not None and len(product_urls) != advertised_count:
+            raise RuntimeError(
+                f"Storefront advertises {advertised_count} products, but only {len(product_urls)} Nana product links were found. "
+                "Catalogue unchanged; refusing an incomplete scrape."
+            )
+
+        products = []
+        for index, url in enumerate(product_urls, start=1):
+            print(f"Scraping Nana product {index}/{len(product_urls)}: {url}")
+            products.append(scrape_product(page, url))
+            time.sleep(0.25)
+        browser.close()
+
+    ids = [item["id"] for item in products]
+    if len(ids) != len(set(ids)):
+        raise RuntimeError("Duplicate product IDs detected; catalogue unchanged.")
+    if advertised_count is not None and len(products) != advertised_count:
+        raise RuntimeError("Scraped product count differs from the store count; catalogue unchanged.")
+
+    old_count = 0
     if OUTPUT.exists():
         try:
-            old = json.loads(OUTPUT.read_text(encoding="utf-8"))
-        except (ValueError, OSError):
-            old = {}
-    old_count = len(old.get("products", [])) if isinstance(old, dict) else 0
+            old_data = json.loads(OUTPUT.read_text(encoding="utf-8"))
+            old_count = len(old_data.get("products", []))
+        except (OSError, ValueError, AttributeError):
+            pass
     if old_count >= 5 and len(products) < max(2, int(old_count * 0.45)):
         raise RuntimeError(f"Unexpected catalogue drop ({old_count} -> {len(products)}); old catalogue preserved.")
 
-    products.sort(key=lambda item: item["id"])
     payload = {
         "store_url": STORE_URL,
         "vendor_id": vendor_id,
         "updated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "source": "basalam-vendor-products-api",
+        "source": "basalam-public-storefront-scrape",
         "products": products,
     }
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"Synced {len(products)} Nana Accessory products (vendor {vendor_id}).")
+    print(f"Successfully scraped {len(products)} products from Nana Accessory (vendor {vendor_id}).")
 
 
 if __name__ == "__main__":
