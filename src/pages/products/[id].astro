@@ -1,0 +1,91 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import data from '../../data/products.json';
+
+const products = Array.isArray(data.products) ? data.products : [];
+export function getStaticPaths() {
+  const products = Array.isArray(data.products) ? data.products : [];
+  return products.map((product) => ({ params: { id: String(product.id) }, props: { product } }));
+}
+const { product } = Astro.props;
+const related = products.filter((item) => String(item.id) !== String(product.id)).slice(0, 4);
+const title = `${product.name} | خرید از نانا اکسسوری شاپ`;
+const description = `مشاهده عکس و قیمت ${product.name} در نانا اکسسوری شاپ. برای بررسی موجودی و ثبت سفارش، وارد صفحه این محصول در باسلام شوید.`;
+const canonical = `https://nana-accessory.ir/products/${product.id}/`;
+const image = product.image || 'https://nana-accessory.ir/og-cover.svg';
+const productSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: product.name,
+  image: [image],
+  description,
+  sku: String(product.id),
+  brand: { '@type': 'Brand', name: 'نانا اکسسوری شاپ' },
+  offers: {
+    '@type': 'Offer',
+    url: canonical,
+    priceCurrency: 'IRR',
+    price: Number(product.price || 0) * 10,
+    seller: { '@type': 'Organization', name: 'نانا اکسسوری شاپ' }
+  }
+};
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'خانه', item: 'https://nana-accessory.ir/' },
+    { '@type': 'ListItem', position: 2, name: 'محصولات', item: 'https://nana-accessory.ir/#products' },
+    { '@type': 'ListItem', position: 3, name: product.name, item: canonical }
+  ]
+};
+---
+<BaseLayout title={title} description={description} image={image} canonical={canonical}>
+  <Fragment slot="head">
+    <meta property="product:price:amount" content={String(Number(product.price || 0) * 10)} />
+    <meta property="product:price:currency" content="IRR" />
+    <script type="application/ld+json" set:html={JSON.stringify(productSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+  </Fragment>
+  <Header />
+  <main class="container py-8 md:py-14">
+    <nav aria-label="مسیر صفحه" class="mb-7 text-xs font-bold text-[#a27b89]">
+      <a href="/" class="transition hover:text-[#b65e80]">خانه</a><span class="mx-2">/</span><a href="/#products" class="transition hover:text-[#b65e80]">محصولات نانا</a><span class="mx-2">/</span><span class="text-[#70495a]">{product.name}</span>
+    </nav>
+    <section class="grid items-start gap-8 md:grid-cols-2 md:gap-14">
+      <div class="relative mx-auto w-full max-w-[560px]">
+        <div class="absolute -inset-3 rotate-2 rounded-[2.5rem] bg-[#f9e3eb]"></div>
+        <div class="relative overflow-hidden rounded-[2.2rem] border-[7px] border-white bg-white soft-card">
+          <img class="product-detail-image w-full" src={product.image || '/product-placeholder.svg'} alt={product.name} fetchpriority="high" decoding="async" />
+        </div>
+        <span class="absolute -bottom-4 -left-2 rounded-full border-4 border-white bg-[#fff0c9] px-5 py-3 text-sm font-black text-[#95643f] shadow-lg">با عشق انتخاب شده ♡</span>
+      </div>
+      <div class="pt-2 md:pt-6">
+        <span class="inline-flex rounded-full border border-rose-200 bg-[#fff2f6] px-4 py-2 text-xs font-black text-[#b65e80]">✿ از کالکشن نانا</span>
+        <h1 class="mt-5 text-3xl leading-[1.7] font-black text-[#593544] md:text-4xl">{product.name}</h1>
+        <p class="mt-5 text-sm leading-9 text-[#876b76]">این محصول دوست‌داشتنی رو در نانا اکسسوری شاپ ببین. برای بررسی جزئیات، موجودی و ثبت سفارش، می‌تونی وارد صفحه اختصاصی محصول در باسلام بشی.</p>
+        <div class="mt-7 rounded-[1.6rem] border border-rose-100 bg-white p-5 soft-card">
+          <p class="text-xs font-bold text-[#a27b89]">قیمت ثبت‌شده در آخرین به‌روزرسانی</p>
+          <p class="mt-2 text-2xl font-black text-[#a64f72]">{product.price ? `${Number(product.price).toLocaleString('fa-IR')} تومان` : 'استعلام قیمت در باسلام'}</p>
+          <p class="mt-2 text-[11px] leading-6 text-[#ad929d]">قیمت و موجودی نهایی ممکنه تغییر کنه؛ قبل از سفارش در باسلام بررسی کن.</p>
+        </div>
+        <div class="mt-7 flex flex-wrap gap-3">
+          <a class="button-primary inline-flex items-center justify-center rounded-full px-7 py-4 text-sm font-black shadow-lg transition hover:-translate-y-1" href={product.url} target="_blank" rel="noopener noreferrer">خرید و بررسی موجودی در باسلام ↗</a>
+          <a class="inline-flex items-center justify-center rounded-full border border-[#e7bdcb] bg-white px-6 py-4 text-sm font-bold text-[#805466] transition hover:bg-[#fff1f5]" href="/#products">بازگشت به محصولات</a>
+        </div>
+        <p class="mt-7 text-xs leading-7 text-[#ad929d]">♡ نانا اکسسوری شاپ | انتخاب‌های فانتزی و دوست‌داشتنی</p>
+      </div>
+    </section>
+    {related.length > 0 && <section class="mt-24 border-t border-rose-100 pt-12">
+      <div class="mb-7 flex items-end justify-between gap-4"><div><p class="text-sm font-black text-[#c16c8d]">شاید اینا رو هم دوست داشته باشی ✿</p><h2 class="mt-2 text-2xl font-black text-[#593544]">چندتا خوشگل دیگه</h2></div><a href="/#products" class="text-xs font-bold text-[#a65d79]">همه محصولات ←</a></div>
+      <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        {related.map((item) => <a href={`/products/${item.id}/`} class="product-card rounded-[1.5rem] border border-rose-100 bg-white p-2.5">
+          <img src={item.image || '/product-placeholder.svg'} alt={item.name} loading="lazy" decoding="async" class="product-image w-full rounded-[1.1rem]" />
+          <h3 class="px-2 pt-3 text-sm leading-6 font-extrabold text-[#62414f]">{item.name}</h3>
+          <p class="px-2 pt-2 pb-1 text-sm font-black text-[#b65e80]">{item.price ? `${Number(item.price).toLocaleString('fa-IR')} تومان` : 'قیمت در باسلام'}</p>
+        </a>)}
+      </div>
+    </section>}
+  </main>
+  <footer class="mt-12 border-t border-rose-100 bg-white py-8"><div class="container flex flex-col items-center justify-between gap-3 text-center text-xs text-[#a27b89] sm:flex-row"><a href="/" class="font-black text-[#70495a]">♡ نانا اکسسوری شاپ</a><a href="https://basalam.com/nana-accessory" target="_blank" rel="noopener noreferrer">غرفه نانا در باسلام ↗</a><a href="https://www.instagram.com/nana.accessoryy/" target="_blank" rel="noopener noreferrer">اینستاگرام ↗</a></div></footer>
+</BaseLayout>

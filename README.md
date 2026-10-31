@@ -60,3 +60,9 @@ GitHub Actions نیز Chromium و وابستگی‌هایش را نصب می‌�
 - یک تصویر واقعی و باکیفیت `og-cover.svg` با اندازه‌ی پیشنهادی 1200×630 در `public/` قرار بده.
 - برای محصولات، عکس واقعی و عنوان فارسی دقیق در باسلام وارد کن؛ عنوان‌های واقعی و توصیفی از تکرار کلمات کلیدی بهترند.
 - اطلاعات قیمت/موجودی را در صفحه‌ی باسلام بررسی کن؛ قیمت نهایی و موجودی می‌تواند تغییر کند.
+
+## Product SEO pages
+
+Every synced Basalam item is also generated as a first-party static page at `/products/<product-id>/`. Product cards link to these pages first; each detail page links out to the matching Basalam listing for checkout and links back to the catalogue and related products. Astro's sitemap integration includes generated product routes automatically. Product pages include a self-referencing canonical URL, Open Graph metadata, `Product` JSON-LD and `BreadcrumbList` JSON-LD. The homepage includes an `ItemList` for the product catalogue.
+
+The product schema price is converted back to IRR because the scraper stores display prices in Toman. Availability is intentionally omitted because the scraper does not currently verify stock status.

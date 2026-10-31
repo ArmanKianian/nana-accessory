@@ -5,10 +5,11 @@ import data from '../data/products.json';
 const products = Array.isArray(data.products) ? data.products : [];
 const updated = data.updated_at ? new Date(data.updated_at).toLocaleDateString('fa-IR') : '';
 const description = 'خرید آنلاین اکسسوری دخترانه و فانتزی از نانا اکسسوری شاپ؛ دیدن مدل‌ها و قیمت‌های به‌روز، اکسسوری مو، گیره، کلیپس و هدیه‌های خاص. سفارش مستقیم از غرفه نانا در باسلام.';
-const jsonLd = { '@context':'https://schema.org', '@type':'Store', name:'نانا اکسسوری شاپ', alternateName:'Nana Accessory Shop', url:'https://nana-accessory.ir/', description, image:'https://nana-accessory.ir/og-cover.jpg', sameAs:['https://basalam.com/nana-accessory','https://www.instagram.com/nana.accessoryy/'], priceRange:'تومان' };
+const jsonLd = { '@context':'https://schema.org', '@type':'Store', name:'نانا اکسسوری شاپ', alternateName:'Nana Accessory Shop', url:'https://nana-accessory.ir/', description, image:'https://nana-accessory.ir/og-cover.svg', sameAs:['https://basalam.com/nana-accessory','https://www.instagram.com/nana.accessoryy/'], priceRange:'تومان' };
+const productListSchema = { '@context':'https://schema.org', '@type':'ItemList', name:'محصولات نانا اکسسوری شاپ', itemListElement: products.map((product, index) => ({ '@type':'ListItem', position:index + 1, url:`https://nana-accessory.ir/products/${product.id}/`, name:product.name })) };
 ---
 <BaseLayout description={description}>
-  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonLd)} /></Fragment>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonLd)} /><script type="application/ld+json" set:html={JSON.stringify(productListSchema)} /></Fragment>
   <Header />
   <main>
     <section class="pink-gradient relative overflow-hidden">
@@ -17,11 +18,13 @@ const jsonLd = { '@context':'https://schema.org', '@type':'Store', name:'نان�
           <span class="mb-6 inline-flex items-center gap-2 rounded-full border border-rose-200 bg-white/70 px-4 py-2 text-xs font-bold text-[#a65d79]"><span>✿</span> یه گوشه‌ی کوچیک برای خوشگلی‌های تو</span>
           <h1 class="max-w-2xl text-4xl leading-[1.55] font-black tracking-tight text-[#593544] md:text-6xl">جزئیات کوچیک،<br/><span class="text-[#c46e91]">حالِ خوبِ بزرگ.</span></h1>
           <p class="mt-6 max-w-xl text-base leading-9 text-[#876b76] md:text-lg">به دنیای نانا خوش اومدی! اینجا اکسسوری‌های دخترونه، فانتزی و دوست‌داشتنی رو کنار هم می‌بینی؛ برای اینکه استایل هر روزت یه کوچولو بیشتر شبیه خودت باشه. ♡</p>
-          <div class="mt-9 flex flex-wrap gap-3"><a href="#products" class="rounded-full bg-[#60394b] px-7 py-4 text-sm font-extrabold text-white shadow-xl shadow-rose-900/15 transition hover:-translate-y-1 hover:bg-[#8c4d68]">دیدن محصولات نانا ↓</a><a href="https://www.instagram.com/nana.accessoryy/" target="_blank" rel="noopener noreferrer" class="rounded-full border border-[#d9a6b8] bg-white/60 px-7 py-4 text-sm font-bold text-[#74495b] transition hover:bg-white">گپ توی اینستاگرام ↗</a></div>
+          <div class="mt-9 flex flex-wrap gap-3"><a href="#products" class="button-primary rounded-full px-7 py-4 text-sm font-extrabold shadow-xl shadow-rose-900/15 transition hover:-translate-y-1">دیدن محصولات نانا ↓</a><a href="https://www.instagram.com/nana.accessoryy/" target="_blank" rel="noopener noreferrer" class="rounded-full border border-[#d9a6b8] bg-white/60 px-7 py-4 text-sm font-bold text-[#74495b] transition hover:bg-white">گپ توی اینستاگرام ↗</a></div>
           <div class="mt-10 flex flex-wrap gap-6 text-xs font-bold text-[#a27b89]"><span>♡ انتخاب‌های دوست‌داشتنی</span><span>✿ مدل‌های فانتزی</span><span>✧ حال خوبِ نانا</span></div>
         </div>
         <div class="relative mx-auto w-full max-w-[470px]">
           <div class="absolute -inset-5 rotate-3 rounded-[3rem] bg-white/60"></div>
+          <div class="absolute -right-5 top-10 z-20 grid size-16 rotate-12 place-items-center rounded-2xl border-4 border-white bg-[#f7d7e3] text-3xl text-[#a64f72] shadow-lg">♡</div>
+          <div class="absolute -bottom-7 right-8 z-20 rounded-full border-4 border-white bg-[#fff0c9] px-5 py-3 text-sm font-black text-[#95643f] shadow-lg">tiny things, big joy ✿</div>
           <div class="relative grid aspect-[4/4.3] place-items-center overflow-hidden rounded-[2.7rem] border-[10px] border-white/80 bg-gradient-to-br from-[#f5cbd9] via-[#fce9e7] to-[#e8d9f2] soft-shadow">
             <div class="absolute left-8 top-8 text-5xl text-white/90">✿</div><div class="absolute right-8 bottom-8 text-5xl text-white/90">♡</div>
             <div class="text-center"><div class="mb-3 text-8xl text-[#b65e80]">୨୧</div><p class="text-3xl font-black text-[#74465a]">a little<br/>pretty things</p><p class="mt-4 text-sm font-bold tracking-widest text-[#a66d83]">NANA ACCESSORY</p></div>
@@ -29,14 +32,14 @@ const jsonLd = { '@context':'https://schema.org', '@type':'Store', name:'نان�
           <div class="absolute -bottom-5 -left-4 rounded-2xl bg-white px-5 py-3 text-sm font-black text-[#9d5875] soft-shadow">با عشق، برای تو ♡</div>
         </div>
       </div>
-      <span class="ornament absolute right-[5%] top-12 text-5xl">✧</span><span class="ornament absolute bottom-12 left-[8%] text-4xl">♡</span>
+      <span class="ornament absolute right-[5%] top-12 text-5xl">✧</span><span class="ornament absolute bottom-12 left-[8%] text-4xl">♡</span><span class="absolute bottom-8 right-[48%] text-3xl text-[#e5a9bd]">୨୧</span>
     </section>
 
     <section id="products" class="container scroll-mt-24 py-20">
       <div class="mb-9 flex flex-wrap items-end justify-between gap-4"><div><p class="mb-3 text-sm font-black text-[#c16c8d]">✿ منتخب‌های نانا</p><h2 class="text-3xl font-black text-[#593544] md:text-4xl">یه چیز کوچولو، یه عالمه ذوق.</h2><p class="mt-3 text-sm leading-7 text-[#987d87]">محصولات و قیمت‌ها با غرفه‌ی نانا در باسلام هماهنگ می‌شن.</p></div><a href="https://basalam.com/nana-accessory" target="_blank" rel="noopener noreferrer" class="rounded-full border border-rose-200 px-5 py-3 text-xs font-bold text-[#9e5975] hover:bg-rose-50">مشاهده غرفه در باسلام ↗</a></div>
       {products.length > 0 ? <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 lg:gap-6">
         {products.map((product) => <article class="product-card overflow-hidden rounded-[1.6rem] border border-rose-100 bg-white p-2.5">
-          <a href={product.url} target="_blank" rel="noopener noreferrer" aria-label={`مشاهده ${product.name} در باسلام`}><img class="product-image w-full rounded-[1.2rem]" src={product.image || '/product-placeholder.svg'} alt={product.name} loading="lazy" decoding="async"/><div class="px-2 pt-4 pb-2"><h3 class="line-clamp-2 min-h-12 text-sm leading-6 font-extrabold text-[#62414f]">{product.name}</h3><div class="mt-3 flex items-center justify-between gap-2"><span class="text-sm font-black text-[#b65e80]">{product.price ? `${Number(product.price).toLocaleString('fa-IR')} تومان` : 'قیمت در باسلام'}</span><span class="text-xs text-[#c58aa0]">♡</span></div></div></a>
+          <a href={`/products/${product.id}/`} aria-label={`مشاهده ${product.name} در فروشگاه نانا`}><img class="product-image w-full rounded-[1.2rem]" src={product.image || '/product-placeholder.svg'} alt={product.name} loading="lazy" decoding="async"/><div class="px-2 pt-4 pb-2"><h3 class="line-clamp-2 min-h-12 text-sm leading-6 font-extrabold text-[#62414f]">{product.name}</h3><div class="mt-3 flex items-center justify-between gap-2"><span class="text-sm font-black text-[#b65e80]">{product.price ? `${Number(product.price).toLocaleString('fa-IR')} تومان` : 'قیمت در باسلام'}</span><span class="text-xs text-[#c58aa0]">♡ جزئیات</span></div></div></a>
         </article>)}
       </div> : <div class="rounded-[2rem] border border-dashed border-rose-200 bg-[#fff7f8] px-6 py-14 text-center"><div class="text-5xl text-[#d78ca8]">୨୧</div><h3 class="mt-5 text-xl font-black text-[#70495a]">قشنگیا دارن آماده می‌شن!</h3><p class="mt-3 text-sm leading-7 text-[#987d87]">برای دیدن همه‌ی محصولات و قیمت‌های به‌روز، فعلاً به غرفه‌ی نانا در باسلام سر بزن.</p><a href="https://basalam.com/nana-accessory" target="_blank" rel="noopener noreferrer" class="mt-6 inline-flex rounded-full bg-[#60394b] px-6 py-3 text-sm font-bold text-white">رفتن به غرفه نانا ↗</a></div>}
       <p class="mt-6 text-center text-[11px] text-[#b296a0]">{updated ? `آخرین به‌روزرسانی محصولات: ${updated}` : 'قیمت و موجودی نهایی را هنگام ثبت سفارش در باسلام بررسی کنید.'}</p>
